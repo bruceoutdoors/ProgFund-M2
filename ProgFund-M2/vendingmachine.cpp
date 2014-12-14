@@ -13,6 +13,7 @@ VendingMachine::VendingMachine(string moneyFile, string stockFile, string logFil
 {
 	money = new CashContainer(moneyFile);
 	drinks = new DrinksStock(stockFile);
+	logger = new TransactionLogger(logFile);
 	readSettings();
 }
 
@@ -27,13 +28,10 @@ void VendingMachine::run()
 		price = Round((*drinks)[choice].cost * quantity);
 		purchaseMenu();
 		if (performTransaction()) {
-			// successful transaction! accept money and decrement 
-			// drink quantity
-			*money += inputAmount;
+			// successful transaction! and decrement drink quantity
 			--(*drinks)[choice].quantity;
 
 			// write changes to disk:
-			money->save();
 			drinks->save();
 
 			cout << endl << "There is your " << (*drinks)[choice].name << "!" << endl
@@ -58,6 +56,7 @@ VendingMachine::~VendingMachine()
 {
 	delete money;
 	delete drinks;
+	delete logger;
 }
 
 void VendingMachine::printMenu()
@@ -114,11 +113,7 @@ void VendingMachine::purchaseMenu(float amount)
 {
 	system("CLS");
 
-	cout << addPadding("Purchase of " + (*drinks)[choice].name + " x" + numToString(quantity), 38)
-		<< "RM" << price
-		<< endl
-		<< addPadding("Amount paid", 38)
-		<< "RM" << amount << endl << endl;
+	itemAmountDisplay(amount);
 
 	cout << "Insert" << endl;
 	char menuIdx = A;
@@ -153,11 +148,11 @@ void VendingMachine::purchaseMenu(float amount)
 */
 void VendingMachine::itemAmountDisplay(float amount)
 {
-	cout << addPadding("Purchase of " + (*drinks)[choice].name, 38)
-	 	 << "RM" << (*drinks)[choice].cost 
-		 << endl
-	     << addPadding("Amount paid", 38)
-	     << "RM" << amount << endl << endl;
+	cout << addPadding("Purchase of " + (*drinks)[choice].name + " x" + numToString(quantity), 38)
+		<< "RM" << price
+		<< endl
+		<< addPadding("Amount paid", 38)
+		<< "RM" << amount << endl << endl;
 }
 
 /*
@@ -172,24 +167,40 @@ bool VendingMachine::performTransaction()
 
 	float difference = Round(inputAmount.getTotal() - price);
 
-	// return if exact amount immediately if it is 0
-	if (difference == 0) return true;
-
 	// calculate the required change
 	CashContainer change(difference);
 
 	// change is dispense if it can be dispensed,
 	// otherwise the user's money is returned.
 	if (money->hasChange(change)) {
-		// display change:
-		cout << "Change dispensed" << endl;
-		for (int i = 0; i < CashContainer::SIZE; i++) {
-			if (change[i] == 0) continue;
-			cout << "RM" << CashContainer::getValue(i) << " x "
-				<< change[i] << endl;
+		// return if it is exact amount there'll be no change
+		if (difference > 0) {
+			// display change:
+			cout << "Change dispensed" << endl;
+			for (int i = 0; i < CashContainer::SIZE; i++) {
+				if (change[i] == 0) continue;
+				cout << "RM" << CashContainer::getValue(i) << " x "
+					<< change[i] << endl;
+			}
 		}
-		// dispense the change from the cash container
+		
+		// dispense the change and accept input money
 		*money -= change;
+		*money += inputAmount;
+		money->save();
+		
+		// log transaction:
+		Transaction trans = {
+			(*drinks)[choice],
+			quantity,
+			inputAmount.getTotal(),
+			change.getTotal(),
+			*money
+		};
+
+		logger->logTransaction(trans);
+
+		inputAmount.makeEmpty();
 		return true;
 	} else {
 		cout << "Payment returned\t" << inputAmount.getTotal() << endl << endl;
@@ -206,7 +217,7 @@ bool VendingMachine::performTransaction()
 
 void VendingMachine::launchAdminPanel()
 {
-	AdminPanel admin(money, drinks);
+	AdminPanel admin(money, drinks, logger);
 	admin.run();
 	readSettings();
 }
@@ -222,5 +233,13 @@ void VendingMachine::getQuantity()
 {
 	cout << endl << "Enter your desired quantity. Maximum is " << maxCans << ": ";
 	cin >> quantity;
-	if (quantity < 0 || quantity > maxCans) getQuantity();
+	if (quantity < 0) {
+		cout << "Negative values are not accepted." << endl;
+	} else if (quantity > maxCans) {
+		cout << "You cannot purchase more than " << maxCans << " cans." << endl;
+	} else if (quantity > (*drinks)[choice].quantity) {
+		cout << "I'm sorry, we only have " << (*drinks)[choice].quantity << " left" << endl;
+	} else return;
+
+	getQuantity();
 }

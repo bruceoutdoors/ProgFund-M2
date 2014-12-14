@@ -1,17 +1,22 @@
 #include "adminpanel.h"
 #include "cashcontainer.h"
 #include "drinksstock.h"
+#include "transactionlogger.h"
 #include "padder.h"
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <windows.h>
 
 const string settingsdir = "data/settings";
 
-AdminPanel::AdminPanel(CashContainer *money, DrinksStock *drinks)
+AdminPanel::AdminPanel(CashContainer *money, 
+	DrinksStock *drinks, 
+	TransactionLogger *logger)
 {
 	this->money = money;
 	this->drinks = drinks;
+	this->logger = logger;
 
 	ifstream file(settingsdir);
 	if (file.good()) file >> maxCans;
@@ -57,6 +62,7 @@ void AdminPanel::mainMenu()
 		setInitMoney();
 		break;
 	case 'd':  
+		clearTransactionLog();
 		break;
 	case 'e': 
 		break;
@@ -184,4 +190,21 @@ void AdminPanel::setInitMoney()
 	money->set(choice, newval);
 	money->save();
 	setInitMoney();
+}
+
+void AdminPanel::clearTransactionLog()
+{
+	cout << endl
+		<< "This is effectively wipe out all your transaction log data." << endl
+		<< "Are you sure you want to do this? (y/n) " << endl
+		<< " => ";
+	char choice;
+	cin >> choice;
+
+	if (choice == 'y') {
+		logger->clearLog();
+		// display success message for 2 seconds
+		cout << endl << "Success! All data in log file has been wiped out.";
+		Sleep(2000);
+	} 
 }

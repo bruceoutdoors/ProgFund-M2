@@ -3,6 +3,7 @@
 #include <string>
 #include "cashcontainer.h"
 #include "drinksstock.h"
+#include "transactionlogger.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ private:
 	CashContainer inputAmount;
 	CashContainer *money;
 	DrinksStock *drinks;
+	TransactionLogger *logger;
 	int choice;
 	int maxCans;
 	int quantity;

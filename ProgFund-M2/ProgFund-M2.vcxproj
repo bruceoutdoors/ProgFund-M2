@@ -81,6 +81,7 @@
     <ClCompile Include="csv.cpp" />
     <ClCompile Include="drinksstock.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="transactionlogger.cpp" />
     <ClCompile Include="vendingmachine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,7 @@
     <ClInclude Include="padder.h" />
     <ClInclude Include="round.h" />
     <ClInclude Include="stringnum.h" />
+    <ClInclude Include="transactionlogger.h" />
     <ClInclude Include="vendingmachine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
