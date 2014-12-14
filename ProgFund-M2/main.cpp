@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #include "csv.h"
 #include "drinksstock.h"
@@ -51,6 +52,14 @@ int main()
 		string moneyFile = "data/money";
 		string stockFile = "data/drinks-stock.csv";
 		VendingMachine machine(moneyFile, stockFile, logFile);
+
+		/*char input;
+		cout << "Enter 'a' to access admin panel, other inputs starts the vending machine" << endl << " >> ";
+		cin >> input;
+
+		if (input == 'a') machine.launchAdminPanel();
+		
+		system("CLS");*/
 		machine.run();
 
 	} catch (exception e) {

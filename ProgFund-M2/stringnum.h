@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 // copy pasted from http://www.cplusplus.com/articles/D9j2Nwbp/
 
 template <typename T>

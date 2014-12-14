@@ -30,6 +30,9 @@
     <ClCompile Include="vendingmachine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="adminpanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csv.h">
@@ -48,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendingmachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adminpanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="padder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

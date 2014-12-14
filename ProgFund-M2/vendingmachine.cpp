@@ -1,6 +1,11 @@
 #include "vendingmachine.h"
+#include "adminpanel.h"
+#include "stringnum.h"
+#include "padder.h"
 #include "round.h"
 #include <iostream>
+#include <cstdlib>
+#include <fstream>
 
 #define A 97
 
@@ -8,13 +13,18 @@ VendingMachine::VendingMachine(string moneyFile, string stockFile, string logFil
 {
 	money = new CashContainer(moneyFile);
 	drinks = new DrinksStock(stockFile);
+	readSettings();
 }
 
 void VendingMachine::run()
 {
 	while (true) {
+		cout << ">> Enter '*' to access admin panel <<" << endl << endl;
+		cout << "The vending machine welcomes you customer! Please enter a selection:" << endl << endl;
 		printMenu();
-		choice = getUserChoice();
+		getUserChoice();
+		getQuantity();
+		price = Round((*drinks)[choice].cost * quantity);
 		purchaseMenu();
 		if (performTransaction()) {
 			// successful transaction! accept money and decrement 
@@ -32,7 +42,7 @@ void VendingMachine::run()
 			cout << endl << "Would you like to try again?";
 		}
 
-		cout << "(y/n) => ";
+		cout << " (y/n) => ";
 		char input;
 		cin >> input;
 		if (input != 'y') {
@@ -66,20 +76,17 @@ void VendingMachine::printMenu()
 	cout << endl << "Purchase (a to " << --idx << ") => ";
 }
 
-string VendingMachine::addPadding(const string &str, size_t padding)
-{
-	string result = str;
-	int pads = padding - str.size();
-	while (pads-- > 0) result.append(" ");
-
-	return result;
-}
-
-int VendingMachine::getUserChoice()
+void VendingMachine::getUserChoice()
 {
 	char idx = A;
 	char input = A;
 	cin >> input;
+
+	if (input == '*') {
+		launchAdminPanel();
+		system("CLS");
+		run(); // restart the vending machine
+	}
 
 	for (size_t i = 0; i < drinks->getDrinkCount(); i++) {
 		if (input == idx++) {
@@ -88,7 +95,8 @@ int VendingMachine::getUserChoice()
 					<< " is sold out. ";
 				break;
 			}
-			return i;
+			choice = i;
+			return;
 		}
 	}
 	cout << "Invalid selection! Please try again: ";
@@ -105,7 +113,13 @@ int VendingMachine::getUserChoice()
 void VendingMachine::purchaseMenu(float amount)
 {
 	system("CLS");
-	itemAmountDisplay(amount);
+
+	cout << addPadding("Purchase of " + (*drinks)[choice].name + " x" + numToString(quantity), 38)
+		<< "RM" << price
+		<< endl
+		<< addPadding("Amount paid", 38)
+		<< "RM" << amount << endl << endl;
+
 	cout << "Insert" << endl;
 	char menuIdx = A;
 
@@ -127,7 +141,7 @@ void VendingMachine::purchaseMenu(float amount)
 		}
 	}
 
-	if (inputAmount.getTotal() < (*drinks)[choice].cost) {
+	if (inputAmount.getTotal() < price) {
 		// function recurses until the required amount is reached
 		return purchaseMenu(inputAmount.getTotal());
 	}
@@ -156,7 +170,7 @@ bool VendingMachine::performTransaction()
 	system("CLS");
 	itemAmountDisplay(inputAmount.getTotal());
 
-	float difference = Round(inputAmount.getTotal() - (*drinks)[choice].cost);
+	float difference = Round(inputAmount.getTotal() - price);
 
 	// return if exact amount immediately if it is 0
 	if (difference == 0) return true;
@@ -188,4 +202,25 @@ bool VendingMachine::performTransaction()
 		}
 		return false;
 	}
+}
+
+void VendingMachine::launchAdminPanel()
+{
+	AdminPanel admin(money, drinks);
+	admin.run();
+	readSettings();
+}
+
+void VendingMachine::readSettings()
+{
+	ifstream file("data/settings");
+	if (file.good()) file >> maxCans;
+	else maxCans = 5;
+}
+
+void VendingMachine::getQuantity()
+{
+	cout << endl << "Enter your desired quantity. Maximum is " << maxCans << ": ";
+	cin >> quantity;
+	if (quantity < 0 || quantity > maxCans) getQuantity();
 }

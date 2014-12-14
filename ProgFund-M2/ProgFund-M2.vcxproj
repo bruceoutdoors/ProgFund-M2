@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="adminpanel.cpp" />
     <ClCompile Include="cashcontainer.cpp" />
     <ClCompile Include="csv.cpp" />
     <ClCompile Include="drinksstock.cpp" />
@@ -83,9 +84,11 @@
     <ClCompile Include="vendingmachine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="adminpanel.h" />
     <ClInclude Include="cashcontainer.h" />
     <ClInclude Include="csv.h" />
     <ClInclude Include="drinksstock.h" />
+    <ClInclude Include="padder.h" />
     <ClInclude Include="round.h" />
     <ClInclude Include="stringnum.h" />
     <ClInclude Include="vendingmachine.h" />
