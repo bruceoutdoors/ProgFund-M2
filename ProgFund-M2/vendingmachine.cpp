@@ -16,13 +16,13 @@ void VendingMachine::run()
 		printMenu();
 		choice = getUserChoice();
 		purchaseMenu();
-		if (changeDispense()) {
+		if (performTransaction()) {
 			// successful transaction! accept money and decrement 
 			// drink quantity
 			*money += inputAmount;
 			--(*drinks)[choice].quantity;
 
-			// write changes:
+			// write changes to disk:
 			money->save();
 			drinks->save();
 
@@ -119,7 +119,7 @@ void VendingMachine::purchaseMenu(float amount)
 	menuIdx = A;
 	cin >> input;
 
-	// add the input amount to the amount and temporary storage:
+	// add the input amount:
 	for (int i = 0; i < CashContainer::SIZE; i++) {
 		if (input == menuIdx++) {
 			inputAmount.increment(i);
@@ -127,8 +127,6 @@ void VendingMachine::purchaseMenu(float amount)
 		}
 	}
 
-	// added a small value to amount to counter IEEE floating point
-	// precision problem
 	if (inputAmount.getTotal() < (*drinks)[choice].cost) {
 		// function recurses until the required amount is reached
 		return purchaseMenu(inputAmount.getTotal());
@@ -152,10 +150,8 @@ void VendingMachine::itemAmountDisplay(float amount)
 * Dispenses change. Returns true and dispenses the change if there
 * is change, returns false and returns back the user's cash if there
 * is not enough change. If an exact amount is given it just returns true.
-*
-* If change is dispensed, the money struct itself is modified.
 */
-bool VendingMachine::changeDispense()
+bool VendingMachine::performTransaction()
 {
 	system("CLS");
 	itemAmountDisplay(inputAmount.getTotal());

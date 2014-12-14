@@ -19,7 +19,7 @@ private:
 	int getUserChoice();
 	void purchaseMenu(float amount = 0);
 	void itemAmountDisplay(float amount);
-	bool changeDispense();
+	bool performTransaction();
 
 	CashContainer inputAmount;
 	CashContainer *money;
