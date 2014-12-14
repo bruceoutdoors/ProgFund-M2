@@ -60,7 +60,7 @@ int main()
 		if (input == 'a') machine.launchAdminPanel();
 		
 		system("CLS");*/
-		machine.launchAdminPanel();
+		machine.run();
 
 	} catch (exception e) {
 		cout << "ERROR: " << e.what() << endl;

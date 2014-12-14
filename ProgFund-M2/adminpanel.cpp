@@ -9,6 +9,7 @@
 #include <windows.h>
 
 const string settingsdir = "data/settings";
+const string passworddir = "data/password";
 
 AdminPanel::AdminPanel(CashContainer *money, 
 	DrinksStock *drinks, 
@@ -30,6 +31,7 @@ AdminPanel::~AdminPanel()
 
 void AdminPanel::run()
 {
+	askForPassword();
 	mainMenu();
 }
 
@@ -65,6 +67,7 @@ void AdminPanel::mainMenu()
 		clearTransactionLog();
 		break;
 	case 'e': 
+		setPassword();
 		break;
 	default: return;
 	}
@@ -207,4 +210,38 @@ void AdminPanel::clearTransactionLog()
 		cout << endl << "Success! All data in log file has been wiped out.";
 		Sleep(2000);
 	} 
+}
+
+bool AdminPanel::askForPassword()
+{
+	// if file doesn't exist you get a free pass!
+	ifstream file(passworddir);
+	if (!file.good()) return true;
+	
+	string password, input;
+	file >> password;
+
+	cout << "Enter admin password to proceed: " << endl
+		<< "=> ";
+
+
+	while (true) {
+		cin >> input;
+		if (input == password) return true;
+		cout << "Wrong!! Try again: ";
+	}
+}
+
+void AdminPanel::setPassword()
+{
+	ofstream newfile(passworddir, ofstream::trunc);
+	string password;
+	cout << endl << endl
+		<< "Set new password: ";
+
+	cin >> password;
+	newfile << password;
+
+	cout << endl << "Success! New password has been set.";
+	Sleep(2000);
 }

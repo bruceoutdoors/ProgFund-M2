@@ -22,6 +22,8 @@ private:
 	void setMaxCans();
 	void setInitMoney();
 	void clearTransactionLog();
+	void setPassword();
+	bool askForPassword();
 
 	CashContainer *money;
 	DrinksStock *drinks;
