@@ -58,14 +58,14 @@ int main()
 		cin >> input;
 
 		if (input == 'a') machine.launchAdminPanel();
-		
+
 		system("CLS");*/
 		machine.run();
 
-	} catch (exception e) {
+	} catch (exception &e) {
 		cout << "ERROR: " << e.what() << endl;
 	}
-	
+
 
 	return 0;
 }

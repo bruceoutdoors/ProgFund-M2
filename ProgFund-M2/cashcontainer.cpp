@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <cassert>
 
-const float CashContainer::values[] = 
+const float CashContainer::values[] =
 { 20.00f, 10.00f, 5.00f, 1.00f, 0.50f, 0.20f, 0.10f };
 
 CashContainer::CashContainer() : isFile(false), total(0)
@@ -16,7 +16,7 @@ CashContainer::CashContainer() : isFile(false), total(0)
 
 CashContainer::CashContainer(string dir) : isFile(true), fileDir(dir)
 {
-	ifstream file(dir);
+	ifstream file(dir.c_str());
 	if (!file.good())
 		throw runtime_error("I can't find \"" + dir + "\"");
 
@@ -25,14 +25,14 @@ CashContainer::CashContainer(string dir) : isFile(true), fileDir(dir)
 
 	istringstream buffer(line);
 	// assuming the file follows the format as prescribed:
-	for (int i = 0; i < SIZE; i++) buffer >> container[i];
+	for (size_t i = 0; i < SIZE; i++) buffer >> container[i];
 
 	updateTotal();
 }
 
 CashContainer::CashContainer(const int container[SIZE])
 {
-	for (int i = 0; i < SIZE; i++)
+	for (size_t i = 0; i < SIZE; i++)
 		this->container[i] = container[i];
 
 	updateTotal();
@@ -46,7 +46,7 @@ CashContainer::CashContainer(float amount)
 	makeEmpty();
 	amount = Round(amount);
 
-	for (int i = 0; i < SIZE; i++) {
+	for (size_t i = 0; i < SIZE; i++) {
 		// add a small value to counter float precision problems
 		while (values[i] <= amount) {
 			amount -= values[i];
@@ -84,7 +84,7 @@ float CashContainer::getValue(int index)
 
 void CashContainer::checkRange(int index)
 {
-	if (index < 0 || index > SIZE)
+	if (index < 0 || index > (int)SIZE)
 		throw out_of_range(index + " is not a valid index of cash container!");
 }
 
@@ -96,8 +96,8 @@ void CashContainer::makeEmpty()
 
 void CashContainer::save(string dir)
 {
-	ofstream file(dir);
-	for (int i = 0; i < SIZE; i++) 
+	ofstream file(dir.c_str());
+	for (size_t i = 0; i < SIZE; i++)
 		file << container[i] << " ";
 
 	fileDir = dir;
@@ -113,8 +113,8 @@ void CashContainer::save()
 }
 
 /*
-assignment operators are tricky to implement for this scenario 
-(e.g. container[index] = 7), as integers are raw data types 
+assignment operators are tricky to implement for this scenario
+(e.g. container[index] = 7), as integers are raw data types
 without assignment operator overloads. You'll need a proxy integer
 class that overloads the assignment operator, which I couldn't be
 bothered to do :P Ergo a classic set function is used.
@@ -135,7 +135,7 @@ void CashContainer::increment(size_t index, int value)
 CashContainer CashContainer::operator+(const CashContainer &c) const
 {
 	CashContainer result;
-	for (int i = 0; i < SIZE; i++)
+	for (size_t i = 0; i < SIZE; i++)
 		result.set(i, (*this)[i] + c[i]);
 
 	return result;
@@ -144,7 +144,7 @@ CashContainer CashContainer::operator+(const CashContainer &c) const
 CashContainer CashContainer::operator-(const CashContainer &c) const
 {
 	CashContainer result;
-	for (int i = 0; i < SIZE; i++)
+	for (size_t i = 0; i < SIZE; i++)
 		result.set(i, (*this)[i] - c[i]);
 
 	return result;
@@ -157,7 +157,7 @@ operation is completed.
 */
 CashContainer &CashContainer::operator-=(const CashContainer &c)
 {
-	for (int i = 0; i < SIZE; i++)
+	for (size_t i = 0; i < SIZE; i++)
 		this->set(i, (*this)[i] - c[i]);
 
 	return *this;
@@ -165,7 +165,7 @@ CashContainer &CashContainer::operator-=(const CashContainer &c)
 
 CashContainer & CashContainer::operator+=(const CashContainer &c)
 {
-	for (int i = 0; i < SIZE; i++)
+	for (size_t i = 0; i < SIZE; i++)
 		this->set(i, (*this)[i] + c[i]);
 
 	return *this;
@@ -176,7 +176,7 @@ bool CashContainer::hasChange(const CashContainer &other) const
 {
 	CashContainer c = *this - other;
 
-	for (int i = 0; i < SIZE; i++) {
+	for (size_t i = 0; i < SIZE; i++) {
 		if (c[i] < 0) return false;
 	}
 
@@ -186,7 +186,7 @@ bool CashContainer::hasChange(const CashContainer &other) const
 void CashContainer::updateTotal()
 {
 	total = 0;
-	for (int i = 0; i < SIZE; i++) {
+	for (size_t i = 0; i < SIZE; i++) {
 		total += container[i] * values[i];
 	}
 	total = Round(total);

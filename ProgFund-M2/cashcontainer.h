@@ -2,9 +2,9 @@
 
 /*
 It should be assumed that the amount the vending machine takes is in
-RM20, RM10, RM5, RM1, 50cents, 20cents, 10cents. This is fixed and 
-cannot be changed. Therefore we store change and transactions in a 
-float[7] array, where the index of array corresponds to the 
+RM20, RM10, RM5, RM1, 50cents, 20cents, 10cents. This is fixed and
+cannot be changed. Therefore we store change and transactions in a
+float[7] array, where the index of array corresponds to the
 value of each change in its respective order as listed above.
 */
 
@@ -42,14 +42,14 @@ public:
 	void save();
 	bool hasFile() const { return isFile; }
 
-		
+
 private:
 	static void checkRange(int index);
 
 	static const float values[SIZE];
-	float total;
 	int container[SIZE];
 	bool isFile;
 	string fileDir;
+	float total;
 };
 

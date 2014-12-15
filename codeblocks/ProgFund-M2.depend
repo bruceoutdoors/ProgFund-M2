@@ -1,0 +1,90 @@
+# depslib dependency file v1.0
+1418616322 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\adminpanel.cpp
+	"adminpanel.h"
+	"cashcontainer.h"
+	"drinksstock.h"
+	"transactionlogger.h"
+	"padder.h"
+	<cstdlib>
+	<iostream>
+	<fstream>
+	<windows.h>
+
+1418575296 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\adminpanel.h
+	<string>
+
+1418616567 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\cashcontainer.h
+	<string>
+
+1418536996 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\drinksstock.h
+	<vector>
+	"csv.h"
+
+1418482835 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\csv.h
+	<string>
+	<vector>
+
+1418570985 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\transactionlogger.h
+	<string>
+	"csv.h"
+	"drinksstock.h"
+	"cashcontainer.h"
+	"stringnum.h"
+
+1418554508 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\stringnum.h
+	<sstream>
+
+1418562268 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\padder.h
+	<string>
+
+1418616630 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\cashcontainer.cpp
+	"cashcontainer.h"
+	"round.h"
+	<cmath>
+	<fstream>
+	<sstream>
+	<stdexcept>
+	<cassert>
+
+1418543924 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\round.h
+	<cmath>
+
+1418615995 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\csv.cpp
+	"csv.h"
+	<fstream>
+	<sstream>
+	<stdexcept>
+
+1418487480 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\drinksstock.cpp
+	"drinksstock.h"
+	"stringnum.h"
+	<sstream>
+
+1418616995 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\main.cpp
+	<iostream>
+	<cstdlib>
+	"csv.h"
+	"drinksstock.h"
+	"cashcontainer.h"
+	"vendingmachine.h"
+
+1418571198 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\vendingmachine.h
+	<string>
+	"cashcontainer.h"
+	"drinksstock.h"
+	"transactionlogger.h"
+
+1418616005 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\transactionlogger.cpp
+	"transactionlogger.h"
+	<fstream>
+
+1418616550 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\vendingmachine.cpp
+	"vendingmachine.h"
+	"adminpanel.h"
+	"stringnum.h"
+	"padder.h"
+	"round.h"
+	<iostream>
+	<cstdlib>
+	<fstream>
+

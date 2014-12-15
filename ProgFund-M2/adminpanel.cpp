@@ -11,15 +11,15 @@
 const string settingsdir = "data/settings";
 const string passworddir = "data/password";
 
-AdminPanel::AdminPanel(CashContainer *money, 
-	DrinksStock *drinks, 
+AdminPanel::AdminPanel(CashContainer *money,
+	DrinksStock *drinks,
 	TransactionLogger *logger)
 {
 	this->money = money;
 	this->drinks = drinks;
 	this->logger = logger;
 
-	ifstream file(settingsdir);
+	ifstream file(settingsdir.c_str());
 	if (file.good()) file >> maxCans;
 	else maxCans = 5;
 }
@@ -39,7 +39,7 @@ void AdminPanel::mainMenu()
 {
 	system("CLS");
 	char choice;
-	cout << "** Welcome to adminpanel!! **" << endl 
+	cout << "** Welcome to adminpanel!! **" << endl
 		<< endl
 		<< "Select from the following options: " << endl
 		<< endl
@@ -54,19 +54,19 @@ void AdminPanel::mainMenu()
 	cin >> choice;
 	//choice = 'c';
 	switch (choice) {
-	case 'a': 
-		setupDrinks(); 
+	case 'a':
+		setupDrinks();
 		break;
-	case 'b': 
-		setMaxCans(); 
+	case 'b':
+		setMaxCans();
 		break;
-	case 'c': 
+	case 'c':
 		setInitMoney();
 		break;
-	case 'd':  
+	case 'd':
 		clearTransactionLog();
 		break;
-	case 'e': 
+	case 'e':
 		setPassword();
 		break;
 	default: return;
@@ -91,7 +91,7 @@ void AdminPanel::setupDrinks(const string &change)
 			<< "RM" << (*drinks)[i].cost << "\t| "
 			<< (*drinks)[i].quantity << "\t   |\n";
 	}
-	cout << string(dashlen, '-') << endl 
+	cout << string(dashlen, '-') << endl
 		<< endl
 		<< "Select the drink by id (0-" << drinks->getDrinkCount()-1 << ")." << endl
 		<< "To return back to main menu, type invalid numbers" << endl
@@ -102,7 +102,7 @@ void AdminPanel::setupDrinks(const string &change)
 	if (id < 0 || id >= (int)drinks->getDrinkCount()) return;
 
 	string name = (*drinks)[id].name;
-	cout << endl 
+	cout << endl
 		<< "What would like to change in " << name << "?" << endl
 		<< "a) name" << endl
 		<< "b) cost" << endl
@@ -119,7 +119,8 @@ void AdminPanel::setupDrinks(const string &change)
 	case 'a':
 		cout << "Enter new name for " << name << ": " << endl
 			<< "=> ";
-		cin >> (*drinks)[id].name;
+		cin.get(); // ignore newline
+		getline(cin, (*drinks)[id].name);
 		break;
 	case 'b':
 		cout << "Enter new cost for " << name << ": " << endl
@@ -150,9 +151,9 @@ void AdminPanel::setMaxCans()
 	if (newmax < 0 || newmax > 5) {
 		return;
 	}
-	
+
 	maxCans = newmax;
-	ofstream file(settingsdir, ofstream::trunc);
+	ofstream file(settingsdir.c_str(), ofstream::trunc);
 	file << maxCans;
 }
 
@@ -160,30 +161,30 @@ void AdminPanel::setInitMoney()
 {
 	system("CLS");
 	const int dashlen = 25;
-	cout << "Set the initial amount for each denomination: " << endl 
+	cout << "Set the initial amount for each denomination: " << endl
 		<< endl
 		<< string(dashlen, '-') << endl
 	    << "| id | denom    | val   |" << endl
 	    << string(dashlen, '-') << endl;
 
 	for (size_t i = 0; i < CashContainer::SIZE; i++) {
-		cout << "| " << i << "  | RM" << money->getValue(i) 
+		cout << "| " << i << "  | RM" << money->getValue(i)
 			 << "\t| " << (*money)[i] << "\t|" << endl
 		     << string(dashlen, '-') << endl;
 	}
 
-	cout << endl << "Select by id (0-" << CashContainer::SIZE-1 
+	cout << endl << "Select by id (0-" << CashContainer::SIZE-1
 		<< "), invalid numbers to go back" << endl
 		<< "=> ";
 	int choice;
 	cin >> choice;
 
-	if (choice < 0 || choice > CashContainer::SIZE - 1) return;
+	if (choice < 0 || choice > (int)CashContainer::SIZE - 1) return;
 
 	int newval;
-	cout << endl << "Changing value of denomination RM" 
-		<< money->getValue(choice) 
-		<< " (negative values cancels operation)." << endl 
+	cout << endl << "Changing value of denomination RM"
+		<< money->getValue(choice)
+		<< " (negative values cancels operation)." << endl
 		<< endl
 		<< "Enter new value => ";
 	cin >> newval;
@@ -198,7 +199,7 @@ void AdminPanel::setInitMoney()
 void AdminPanel::clearTransactionLog()
 {
 	cout << endl
-		<< "This is effectively wipe out all your transaction log data." << endl
+		<< "This will effectively wipe out all your transaction log data." << endl
 		<< "Are you sure you want to do this? (y/n) " << endl
 		<< " => ";
 	char choice;
@@ -209,15 +210,15 @@ void AdminPanel::clearTransactionLog()
 		// display success message for 2 seconds
 		cout << endl << "Success! All data in log file has been wiped out.";
 		Sleep(2000);
-	} 
+	}
 }
 
 bool AdminPanel::askForPassword()
 {
 	// if file doesn't exist you get a free pass!
-	ifstream file(passworddir);
+	ifstream file(passworddir.c_str());
 	if (!file.good()) return true;
-	
+
 	string password, input;
 	file >> password;
 
@@ -234,12 +235,13 @@ bool AdminPanel::askForPassword()
 
 void AdminPanel::setPassword()
 {
-	ofstream newfile(passworddir, ofstream::trunc);
+	ofstream newfile(passworddir.c_str(), ofstream::trunc);
 	string password;
 	cout << endl << endl
 		<< "Set new password: ";
 
-	cin >> password;
+	cin.get(); // ignore newline
+	getline(cin, password);
 	newfile << password;
 
 	cout << endl << "Success! New password has been set.";

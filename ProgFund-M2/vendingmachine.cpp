@@ -118,7 +118,7 @@ void VendingMachine::purchaseMenu(float amount)
 	cout << "Insert" << endl;
 	char menuIdx = A;
 
-	for (int i = 0; i < CashContainer::SIZE; i++) {
+	for (size_t i = 0; i < CashContainer::SIZE; i++) {
 		cout << menuIdx++ << ") RM" << CashContainer::getValue(i) << endl;
 	}
 
@@ -129,7 +129,7 @@ void VendingMachine::purchaseMenu(float amount)
 	cin >> input;
 
 	// add the input amount:
-	for (int i = 0; i < CashContainer::SIZE; i++) {
+	for (size_t i = 0; i < CashContainer::SIZE; i++) {
 		if (input == menuIdx++) {
 			inputAmount.increment(i);
 			break;
@@ -177,18 +177,18 @@ bool VendingMachine::performTransaction()
 		if (difference > 0) {
 			// display change:
 			cout << "Change dispensed" << endl;
-			for (int i = 0; i < CashContainer::SIZE; i++) {
+			for (size_t i = 0; i < CashContainer::SIZE; i++) {
 				if (change[i] == 0) continue;
 				cout << "RM" << CashContainer::getValue(i) << " x "
 					<< change[i] << endl;
 			}
 		}
-		
+
 		// dispense the change and accept input money
 		*money -= change;
 		*money += inputAmount;
 		money->save();
-		
+
 		// log transaction:
 		Transaction trans = {
 			(*drinks)[choice],
@@ -206,7 +206,7 @@ bool VendingMachine::performTransaction()
 		cout << "Payment returned\t" << inputAmount.getTotal() << endl << endl;
 		inputAmount.makeEmpty();
 
-		for (int i = 0; i < CashContainer::SIZE; i++) {
+		for (size_t i = 0; i < CashContainer::SIZE; i++) {
 			if (change[i] == 0) continue;
 
 			cout << "Unable to dispense\tRM" << CashContainer::getValue(i) << endl;

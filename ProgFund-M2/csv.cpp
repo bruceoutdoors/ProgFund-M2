@@ -16,12 +16,12 @@ Csv::Csv(const Table &table)
 
 void Csv::read(const string &dir)
 {
-	ifstream file(dir);
+	ifstream file(dir.c_str());
 	if (!file.good())
 		throw runtime_error("I can't find \"" + dir + "\"");
 
 	string line, cell;
-	
+
 	while (getline(file, line)) {
 		stringstream lineStream(line);
 		Row r;
@@ -51,13 +51,13 @@ void Csv::appendRow(const Row row)
 
 void Csv::save()
 {
-	ofstream file(directory);
-	for (Table::iterator row = table.begin(); row < table.end(); row++) 
+	ofstream file(directory.c_str());
+	for (Table::iterator row = table.begin(); row < table.end(); row++)
 		writeRow(*row, file);
 }
 
 void Csv::writeRow(const Row row, ofstream &file)
-{	
+{
 	for (size_t i = 0; i < row.size(); i++) {
 		file << row[i];
 		if (i < row.size() - 1) file << ',';
@@ -67,7 +67,7 @@ void Csv::writeRow(const Row row, ofstream &file)
 
 void Csv::writeAppendRow(const Row row)
 {
-	ofstream file(directory, ofstream::app);
+	ofstream file(directory.c_str(), ofstream::app);
 	appendRow(row);
 	writeRow(row, file);
 }
@@ -75,5 +75,5 @@ void Csv::writeAppendRow(const Row row)
 // wipe out the contents of the file
 void Csv::deleteEverything()
 {
-	ofstream file(directory, ofstream::trunc);
+	ofstream file(directory.c_str(), ofstream::trunc);
 }

@@ -4,8 +4,8 @@
 TransactionLogger::TransactionLogger(const string &dir) : fileDir(dir)
 {
 	// create file if it doesn't exist
-	ifstream file(dir);
-	if (!file.good()) ofstream file(dir);
+	ifstream file(dir.c_str());
+	if (!file.good()) ofstream file(dir.c_str());
 
 	csvdat = new Csv(dir);
 }
@@ -32,7 +32,7 @@ void TransactionLogger::logTransaction(const Transaction &trans)
 	row.push_back(numToString(trans.numCans));
 	row.push_back(numToString(trans.paidAmount));
 	row.push_back(numToString(trans.changeDispensed));
-	
+
 	for (size_t i = 0; i < CashContainer::SIZE; i++) {
 		row.push_back(numToString(trans.moneyLeft[i]));
 	}
