@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
+#include <limits> 
 
 #define A 97
 
@@ -43,6 +44,7 @@ void VendingMachine::run()
 		cout << " (y/n) => ";
 		char input;
 		cin >> input;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		if (input != 'y') {
 			cout << endl << "Well, see you soon!" << endl;
 			break;
@@ -80,6 +82,7 @@ void VendingMachine::getUserChoice()
 	char idx = A;
 	char input = A;
 	cin >> input;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 	if (input == '*') {
 		launchAdminPanel();
@@ -232,7 +235,14 @@ void VendingMachine::readSettings()
 void VendingMachine::getQuantity()
 {
 	cout << endl << "Enter your desired quantity. Maximum is " << maxCans << ": ";
-	cin >> quantity;
+
+	if (!(cin >> quantity)) {
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		system("CLS");
+		run(); // restart to main menu
+	}
+
 	if (quantity < 0) {
 		cout << "Negative values are not accepted." << endl;
 	} else if (quantity > maxCans) {

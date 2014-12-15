@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <windows.h>
+#include <limits.h> // INT_MAX
 
 const string settingsdir = "data/settings";
 const string passworddir = "data/password";
@@ -52,7 +53,11 @@ void AdminPanel::mainMenu()
 		<< endl
 		<< "Select (a to e) => ";
 	cin >> choice;
-	//choice = 'c';
+
+	// NOTE: we can't use numeric_limits<streamsize>::max() because it clashes
+	// with the min max macros from <windows.h>
+	cin.ignore(INT_MAX, '\n');
+
 	switch (choice) {
 	case 'a':
 		setupDrinks();
@@ -98,7 +103,11 @@ void AdminPanel::setupDrinks(const string &change)
 		<< "=> ";
 
 	int id;
-	cin >> id;
+	if (!(cin >> id)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		return;
+	}
 	if (id < 0 || id >= (int)drinks->getDrinkCount()) return;
 
 	string name = (*drinks)[id].name;
@@ -112,6 +121,7 @@ void AdminPanel::setupDrinks(const string &change)
 
 	char choice2;
 	cin >> choice2;
+	cin.ignore(INT_MAX, '\n');
 
 	cout << endl;
 
@@ -125,17 +135,23 @@ void AdminPanel::setupDrinks(const string &change)
 	case 'b':
 		cout << "Enter new cost for " << name << ": " << endl
 			<< "=> ";
-		cin >> (*drinks)[id].cost;
+		if (!(cin >> (*drinks)[id].cost)) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+		}
 		break;
 	case 'c':
 		cout << "Enter new quantity for " << name << ": " << endl
 			<< "=> ";
-		cin >> (*drinks)[id].quantity;
+		if (!(cin >> (*drinks)[id].quantity)) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+		}
 		break;
 	default:
 		setupDrinks();
 	}
-
+	cin.ignore(INT_MAX, '\n');
 	drinks->save();
 	setupDrinks("Changes have successfully been saved!");
 }
@@ -147,14 +163,21 @@ void AdminPanel::setMaxCans()
 		<< "Invalid values cancels the operation." << endl
 		<< "=> ";
 	int newmax;
-	cin >> newmax;
-	if (newmax < 0 || newmax > 5) {
+	if (!(cin >> newmax)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
 		return;
 	}
+
+	if (newmax < 0 || newmax > 5) return;
 
 	maxCans = newmax;
 	ofstream file(settingsdir.c_str(), ofstream::trunc);
 	file << maxCans;
+
+	cout << endl << "Success! Max cans has been set to "
+		<< newmax << ".";
+	Sleep(2000);
 }
 
 void AdminPanel::setInitMoney()
@@ -177,7 +200,12 @@ void AdminPanel::setInitMoney()
 		<< "), invalid numbers to go back" << endl
 		<< "=> ";
 	int choice;
-	cin >> choice;
+
+	if (!(cin >> choice)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		return;
+	}
 
 	if (choice < 0 || choice > (int)CashContainer::SIZE - 1) return;
 
@@ -188,6 +216,12 @@ void AdminPanel::setInitMoney()
 		<< endl
 		<< "Enter new value => ";
 	cin >> newval;
+
+	if (!(cin >> newval)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		return;
+	}
 
 	if (newval < 0) return;
 
@@ -204,6 +238,7 @@ void AdminPanel::clearTransactionLog()
 		<< " => ";
 	char choice;
 	cin >> choice;
+	cin.ignore(INT_MAX, '\n');
 
 	if (choice == 'y') {
 		logger->clearLog();
@@ -228,6 +263,7 @@ bool AdminPanel::askForPassword()
 
 	while (true) {
 		cin >> input;
+		cin.ignore(INT_MAX, '\n');
 		if (input == password) return true;
 		cout << "Wrong!! Try again: ";
 	}
@@ -235,15 +271,17 @@ bool AdminPanel::askForPassword()
 
 void AdminPanel::setPassword()
 {
-	ofstream newfile(passworddir.c_str(), ofstream::trunc);
 	string password;
 	cout << endl << endl
-		<< "Set new password: ";
+		<< "Set new password (spaces are not allowed): ";
 
-	cin.get(); // ignore newline
-	getline(cin, password);
+	cin >> password;
+	cin.ignore(INT_MAX, '\n');
+
+	ofstream newfile(passworddir.c_str(), ofstream::trunc);
 	newfile << password;
 
-	cout << endl << "Success! New password has been set.";
+	cout << endl << "Success! Password has been set as \""
+		<< password << "\"";
 	Sleep(2000);
 }

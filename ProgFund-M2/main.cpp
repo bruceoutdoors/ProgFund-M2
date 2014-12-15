@@ -47,19 +47,11 @@ int main()
 		bool adaChangeKah = c2.hasChange(c1);
 		delete container;*/
 
-		//CashContainer c(115.86001f);
 		string logFile = "data/transaction-log.csv";
 		string moneyFile = "data/money";
 		string stockFile = "data/drinks-stock.csv";
 		VendingMachine machine(moneyFile, stockFile, logFile);
 
-		/*char input;
-		cout << "Enter 'a' to access admin panel, other inputs starts the vending machine" << endl << " >> ";
-		cin >> input;
-
-		if (input == 'a') machine.launchAdminPanel();
-
-		system("CLS");*/
 		machine.run();
 
 	} catch (exception &e) {
