@@ -5,8 +5,9 @@
 #include "round.h"
 #include <iostream>
 #include <cstdlib>
+#include <stdexcept>
 #include <fstream>
-#include <limits> 
+#include <limits>
 
 #define A 97
 
@@ -170,52 +171,52 @@ bool VendingMachine::performTransaction()
 
 	float difference = Round(inputAmount.getTotal() - price);
 
-	// calculate the required change
-	CashContainer change(difference);
+	if (difference == 0) {
+		// return if it is exact amount there'll be no change
+		logTransaction(0);
+		return true;
+	}
+
+	CashContainer change;
 
 	// change is dispense if it can be dispensed,
 	// otherwise the user's money is returned.
-	if (money->hasChange(change)) {
-		// return if it is exact amount there'll be no change
-		if (difference > 0) {
-			// display change:
-			cout << "Change dispensed" << endl;
-			for (size_t i = 0; i < CashContainer::SIZE; i++) {
-				if (change[i] == 0) continue;
-				cout << "RM" << CashContainer::getValue(i) << " x "
-					<< change[i] << endl;
-			}
-		}
+	try {
+		// attempt to calculate the required change
+		change = money->calcChange(difference);
 
-		// dispense the change and accept input money
-		*money -= change;
-		*money += inputAmount;
-		money->save();
-
-		// log transaction:
-		Transaction trans = {
-			(*drinks)[choice],
-			quantity,
-			inputAmount.getTotal(),
-			change.getTotal(),
-			*money
-		};
-
-		logger->logTransaction(trans);
-
-		inputAmount.makeEmpty();
-		return true;
-	} else {
+		// we're not passing the exception by reference cause we're not
+		// doing anything with it; setting it as reference gives compiler
+		// warnings. Set it to reference should you require to use the exception.
+	} catch (runtime_error e) {
+		cout << "I'm sorry, I do not have enough change..." << endl << endl;
 		cout << "Payment returned\t" << inputAmount.getTotal() << endl << endl;
 		inputAmount.makeEmpty();
 
 		for (size_t i = 0; i < CashContainer::SIZE; i++) {
-			if (change[i] == 0) continue;
-
-			cout << "Unable to dispense\tRM" << CashContainer::getValue(i) << endl;
+			if (difference >= CashContainer::getValue(i) && (*money)[i] == 0)
+				cout << "Unable to dispense\tRM" << CashContainer::getValue(i) << endl;
 		}
 		return false;
 	}
+
+	// display change:
+	cout << "Change dispensed" << endl;
+	for (size_t i = 0; i < CashContainer::SIZE; i++) {
+		if (change[i] == 0) continue;
+		cout << "RM" << CashContainer::getValue(i) << " x "
+			<< change[i] << endl;
+	}
+
+	// dispense the change and accept input money
+	*money -= change;
+	*money += inputAmount;
+	money->save();
+
+	logTransaction(change.getTotal());
+
+	inputAmount.makeEmpty();
+	return true;
 }
 
 void VendingMachine::launchAdminPanel()
@@ -252,4 +253,18 @@ void VendingMachine::getQuantity()
 	} else return;
 
 	getQuantity();
+}
+
+void VendingMachine::logTransaction(const float change)
+{
+	// log transaction:
+	Transaction trans = {
+		(*drinks)[choice],
+		quantity,
+		inputAmount.getTotal(),
+		change,
+		*money
+	};
+
+	logger->logTransaction(trans);
 }

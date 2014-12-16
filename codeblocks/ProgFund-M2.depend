@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1418616322 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\adminpanel.cpp
+1418640871 source:d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\adminpanel.cpp
 	"adminpanel.h"
 	"cashcontainer.h"
 	"drinksstock.h"
@@ -9,6 +9,7 @@
 	<iostream>
 	<fstream>
 	<windows.h>
+	<limits.h>
 
 1418575296 d:\libraries\documents\visual studio 2013\projects\progfund-m2\progfund-m2\adminpanel.h
 	<string>

@@ -36,16 +36,18 @@ int main()
 		container->set(6, 15);
 		container->save("data/cashcontainer");*/
 
-		/*CashContainer *container = new CashContainer("data/money");
-		int p[] = { 0, 1, 2, 3, 4, 5, 6 };
+		/*CashContainer *container = new CashContainer("data/money");*/
+		/*int p[] = { 0, 1, 3, 0, 3, 5, 15 };
 		int q[] = { 0, 10, 21, 7, 12, 5, 6 };
 		CashContainer c1(p);
-		CashContainer c2(q);
+		CashContainer change = c1.calcChange(3.4);*/
+		/*CashContainer c2(q);
 		c2.getTotal();
 		CashContainer c3 = c1 - c2;
 
 		bool adaChangeKah = c2.hasChange(c1);
 		delete container;*/
+
 
 		string logFile = "data/transaction-log.csv";
 		string moneyFile = "data/money";
@@ -56,6 +58,7 @@ int main()
 
 	} catch (exception &e) {
 		cout << "ERROR: " << e.what() << endl;
+		cin.get();
 	}
 
 

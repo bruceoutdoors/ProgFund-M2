@@ -59,6 +59,26 @@ CashContainer::CashContainer(float amount)
 	assert(amount == 0);
 }
 
+/*
+Copy constructor and assignment operator overloading:
+*/
+CashContainer::CashContainer(const CashContainer &c)
+{
+	*this = c;
+}
+
+CashContainer& CashContainer::operator=(const CashContainer& c)
+{
+	if (this != &c) {
+		for (size_t i = 0; i < SIZE; i++) set(i, c[i]);
+
+		this->total = c.total;
+		this->fileDir = c.fileDir;
+		this->isFile = c.isFile;
+	}
+
+	return *this;
+}
 
 CashContainer::~CashContainer()
 {
@@ -192,4 +212,21 @@ void CashContainer::updateTotal()
 	total = Round(total);
 }
 
+CashContainer CashContainer::calcChange(float changeAmount) const
+{
+	// copy this contents
+	CashContainer thistemp(*this);
+	CashContainer change;
+	for (size_t i = 0; i < SIZE; i++) {
+		while (changeAmount >= values[i] && thistemp[i] > 0) {
+			thistemp.increment(i, -1); // << decrement
+			change.increment(i);
+			changeAmount = Round(changeAmount - values[i]);
+		}
+	}
+
+	if (changeAmount > 0) throw runtime_error("Insufficient change!");
+
+	return change;
+}
 

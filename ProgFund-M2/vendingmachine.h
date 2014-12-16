@@ -23,6 +23,7 @@ private:
 	void itemAmountDisplay(float amount);
 	bool performTransaction();
 	void readSettings();
+	void logTransaction(const float change);
 
 	CashContainer inputAmount;
 	CashContainer *money;

@@ -4,8 +4,8 @@
 It should be assumed that the amount the vending machine takes is in
 RM20, RM10, RM5, RM1, 50cents, 20cents, 10cents. This is fixed and
 cannot be changed. Therefore we store change and transactions in a
-float[7] array, where the index of array corresponds to the
-value of each change in its respective order as listed above.
+int[7] array, where the index of array corresponds to the
+quantity of each change in its respective order as listed above.
 */
 
 #include <string>
@@ -21,6 +21,8 @@ public:
 	CashContainer(float amount);
 	CashContainer(const int container[SIZE]);
 	CashContainer(string dir);
+	CashContainer(const CashContainer &c); // copy constructor
+	CashContainer& operator=(const CashContainer& c); // assignment operator overload
 	~CashContainer();
 
 	static float getValue(int index);
@@ -33,7 +35,7 @@ public:
 	CashContainer &operator-=(const CashContainer &c);
 	CashContainer &operator+=(const CashContainer &c);
 	bool hasChange(const CashContainer &other) const;
-
+	CashContainer calcChange(float changeAmount) const;
 
 	void makeEmpty();
 	void set(size_t index, int value);
