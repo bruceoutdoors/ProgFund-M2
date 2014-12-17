@@ -31,7 +31,7 @@ void VendingMachine::run()
 		purchaseMenu();
 		if (performTransaction()) {
 			// successful transaction! and decrement drink quantity
-			--(*drinks)[choice].quantity;
+			(*drinks)[choice].quantity -= quantity;
 
 			// write changes to disk:
 			drinks->save();
@@ -171,8 +171,10 @@ bool VendingMachine::performTransaction()
 
 	float difference = Round(inputAmount.getTotal() - price);
 
+	// if it is exact amount there'll be no change
 	if (difference == 0) {
-		// return if it is exact amount there'll be no change
+		*money += inputAmount;
+		money->save();
 		logTransaction(0);
 		return true;
 	}
@@ -194,6 +196,8 @@ bool VendingMachine::performTransaction()
 		inputAmount.makeEmpty();
 
 		for (size_t i = 0; i < CashContainer::SIZE; i++) {
+			// Any denomination smaller than the required change that has a quantity 
+			// count of 0 is marked as change that is unable to be dispensed.
 			if (difference >= CashContainer::getValue(i) && (*money)[i] == 0)
 				cout << "Unable to dispense\tRM" << CashContainer::getValue(i) << endl;
 		}
