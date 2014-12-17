@@ -36,7 +36,7 @@ void VendingMachine::run()
 			// write changes to disk:
 			drinks->save();
 
-			cout << endl << "There is your " << (*drinks)[choice].name << "!" << endl
+			cout << endl << "Here is " << quantity  << " " << (*drinks)[choice].name << "!" << endl
 				<< endl << "Would you like to buy another drink?";
 		} else {
 			cout << endl << "Would you like to try again?";
