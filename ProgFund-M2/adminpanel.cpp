@@ -334,4 +334,10 @@ void AdminPanel::addNewDrink()
 		return;
 	}
 	drinks->addDrink(newdrink);
+
+	drinks->save();
+
+	cout << endl << "** Successfully added a new drink: \"" 
+		<< newdrink.name << "\"!" << endl;
+	Sleep(1700);
 }
