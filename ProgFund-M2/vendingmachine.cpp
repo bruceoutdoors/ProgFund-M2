@@ -241,7 +241,7 @@ void VendingMachine::getQuantity()
 {
 	cout << endl << "Enter your desired quantity. Maximum is " << maxCans << ": ";
 
-	if (!(cin >> quantity)) {
+	if (!(cin >> quantity) || quantity == 0) {
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		system("CLS");

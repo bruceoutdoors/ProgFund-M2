@@ -18,7 +18,8 @@ public:
 
 private:
 	void mainMenu();
-	void setupDrinks(const string &change = "");
+	void addNewDrink();
+	void setupDrinks();
 	void setMaxCans();
 	void setInitMoney();
 	void clearTransactionLog();

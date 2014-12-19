@@ -8,6 +8,8 @@
 #include <fstream>
 #include <windows.h>
 #include <limits.h> // INT_MAX
+#include <stdlib.h> // atoi
+#include <ctype.h> // isdigit
 
 const string settingsdir = "data/settings";
 const string passworddir = "data/password";
@@ -80,11 +82,13 @@ void AdminPanel::mainMenu()
 	mainMenu();
 }
 
-void AdminPanel::setupDrinks(const string &change)
+void AdminPanel::setupDrinks()
 {
 	system("CLS");
 
-	if (change != "") cout << "** " << change << endl << endl;
+	bool canAddDrink = false;
+
+	if (drinks->getDrinkCount() < 10) canAddDrink = true;
 
 	int dashlen = 60;
 	cout << "Setup drinks stock:" << endl << endl;
@@ -98,16 +102,25 @@ void AdminPanel::setupDrinks(const string &change)
 	}
 	cout << string(dashlen, '-') << endl
 		<< endl
-		<< "Select the drink by id (0-" << drinks->getDrinkCount()-1 << ")." << endl
-		<< "To return back to main menu, type invalid numbers" << endl
+		<< "Select the drink by id (0-" << drinks->getDrinkCount() - 1 << ")." << endl;
+
+	if (canAddDrink) cout << "To add a drink, enter 'a' (Max 10 drinks)." << endl;
+
+	cout << "To return back to main menu, enter 'b'." << endl
 		<< "=> ";
 
-	int id;
-	if (!(cin >> id)) {
-		cin.clear();
-		cin.ignore(INT_MAX, '\n');
-		return;
-	}
+	char input;
+	cin >> input;
+	cin.ignore(INT_MAX, '\n');
+
+	if (!isdigit(input)) {
+		if (input == 'a' && canAddDrink) {
+			addNewDrink();
+			setupDrinks();
+		} else return;
+	} 
+
+	int id = atoi(&input);
 	if (id < 0 || id >= (int)drinks->getDrinkCount()) return;
 
 	string name = (*drinks)[id].name;
@@ -116,10 +129,12 @@ void AdminPanel::setupDrinks(const string &change)
 		<< "a) name" << endl
 		<< "b) cost" << endl
 		<< "c) quantity" << endl
+		<< "d) remove drink" << endl
 		<< endl
-		<< "Select (a-c), other to cancel => ";
+		<< "Select (a-d), other to cancel => ";
 
 	char choice2;
+	bool isSuccess = true;
 	cin >> choice2;
 	cin.ignore(INT_MAX, '\n');
 
@@ -129,31 +144,42 @@ void AdminPanel::setupDrinks(const string &change)
 	case 'a':
 		cout << "Enter new name for " << name << ": " << endl
 			<< "=> ";
-		cin.get(); // ignore newline
 		getline(cin, (*drinks)[id].name);
 		break;
 	case 'b':
 		cout << "Enter new cost for " << name << ": " << endl
 			<< "=> ";
-		if (!(cin >> (*drinks)[id].cost)) {
-			cin.clear();
-			cin.ignore(INT_MAX, '\n');
-		}
+		if (!(cin >> (*drinks)[id].cost)) isSuccess = false;
 		break;
 	case 'c':
 		cout << "Enter new quantity for " << name << ": " << endl
 			<< "=> ";
-		if (!(cin >> (*drinks)[id].quantity)) {
-			cin.clear();
-			cin.ignore(INT_MAX, '\n');
-		}
+		if (!(cin >> (*drinks)[id].quantity)) isSuccess = false;
+		break; 
+	case 'd':
+		cout << "Are you sure you want to remove " << name << "? (y/n)" << endl
+			<< "=> ";
+		cin >> input;
+		cin.ignore(INT_MAX, '\n');
+		if (input == 'y') drinks->removeDrink(id);
+		else isSuccess = false;
 		break;
 	default:
 		setupDrinks();
 	}
-	cin.ignore(INT_MAX, '\n');
+
+	if (!isSuccess) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		setupDrinks();
+		return;
+	}
+	
 	drinks->save();
-	setupDrinks("Changes have successfully been saved!");
+
+	cout << endl << "** Changes have successfully been saved!" << endl;
+	Sleep(1700);
+	setupDrinks();
 }
 
 void AdminPanel::setMaxCans()
@@ -169,7 +195,7 @@ void AdminPanel::setMaxCans()
 		return;
 	}
 
-	if (newmax < 0 || newmax > 5) return;
+	if (newmax < 1 || newmax > 5) return;
 
 	maxCans = newmax;
 	ofstream file(settingsdir.c_str(), ofstream::trunc);
@@ -284,4 +310,28 @@ void AdminPanel::setPassword()
 	cout << endl << "Success! Password has been set as \""
 		<< password << "\"";
 	Sleep(2000);
+}
+
+void AdminPanel::addNewDrink()
+{
+	cout << endl;
+	Drink newdrink;
+	cout << "Enter new name for new drink: " << endl
+		<< "=> ";
+	getline(cin, newdrink.name);
+	cout << endl << "Enter new cost for " << newdrink.name << ": " << endl
+		<< "=> ";
+	if (!(cin >> newdrink.cost)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		return;
+	}
+	cout << endl << "Enter quantity for " << newdrink.name << ": " << endl
+		<< "=> ";
+	if (!(cin >> newdrink.quantity)) {
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+		return;
+	}
+	drinks->addDrink(newdrink);
 }
