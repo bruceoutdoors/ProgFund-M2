@@ -165,20 +165,22 @@ void AdminPanel::setupDrinks()
 		else isSuccess = false;
 		break;
 	default:
-		setupDrinks();
+		isSuccess = false;
+		break;
 	}
 
 	if (!isSuccess) {
-		cin.clear();
-		cin.ignore(INT_MAX, '\n');
-		setupDrinks();
-		return;
-	}
-	
-	drinks->save();
+		if (!cin.good()) {
+			cin.clear();
+			cin.ignore(INT_MAX, '\n');
+		}
+	} else {
+		drinks->save();
 
-	cout << endl << "** Changes have successfully been saved!" << endl;
-	Sleep(1700);
+		cout << endl << "** Changes have successfully been saved!" << endl;
+		Sleep(1700);
+	}
+
 	setupDrinks();
 }
 
@@ -241,7 +243,6 @@ void AdminPanel::setInitMoney()
 		<< " (negative values cancels operation)." << endl
 		<< endl
 		<< "Enter new value => ";
-	cin >> newval;
 
 	if (!(cin >> newval)) {
 		cin.clear();

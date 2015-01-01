@@ -27,6 +27,8 @@ public:
 	void clearLog();
 
 private:
+	void writeHeaderRow();
+
 	string fileDir;
 	Csv *csvdat;
 };
