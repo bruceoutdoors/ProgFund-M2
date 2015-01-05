@@ -63,6 +63,9 @@ void VendingMachine::run()
 			break;
 		}
 
+		// input amount is always emptied out after each run:
+		inputAmount.makeEmpty();
+
 		system("CLS");
 	}
 }
@@ -205,7 +208,6 @@ bool VendingMachine::performTransaction()
 	} catch (runtime_error e) {
 		cout << "I'm sorry, I do not have enough change..." << endl << endl;
 		cout << "Payment returned\t" << inputAmount.getTotal() << endl << endl;
-		inputAmount.makeEmpty();
 
 		for (size_t i = 0; i < CashContainer::SIZE; i++) {
 			// Any denomination smaller than the required change that has a quantity 
@@ -231,7 +233,6 @@ bool VendingMachine::performTransaction()
 
 	logTransaction(change.getTotal());
 
-	inputAmount.makeEmpty();
 	return true;
 }
 
