@@ -226,18 +226,58 @@ void CashContainer::updateTotal()
 
 CashContainer CashContainer::calcChange(float changeAmount) const
 {
-	// copy this contents
-	CashContainer thistemp(*this);
+	float amount;
+	CashContainer thistemp;
 	CashContainer change;
-	for (size_t i = 0; i < SIZE; i++) {
-		while (changeAmount >= values[i] && thistemp[i] > 0) {
-			thistemp.increment(i, -1); // << decrement
-			change.increment(i);
-			changeAmount = Round(changeAmount - values[i]);
-		}
-	}
+	int ignoredIdx = -1;
+	int ignoreQuantity = 0;
 
-	if (changeAmount > 0) throw runtime_error("Insufficient change!");
+	do {
+		thistemp = *this; // copy this contents
+		change.makeEmpty();
+		amount = changeAmount;
+		
+		for (size_t i = 0; i < SIZE; i++) {
+			int currentQuantity = 0;
+			while (amount >= values[i] && thistemp[i] > 0) {
+				// Test case: 
+				// - change for 2 given 2 0.5, 5 0.2, the change should be 2 0.5 + 5 0.2.
+				// - change for 0.6 given 1 0.5, 3 0.2, 0 0.1, the change should be 3 0.2.
+				// - change for 0.1 given 0 0.1, the change cannot be output.
+				if (ignoredIdx != -1 && values[i] == values[ignoredIdx]) {
+					// selectively choose an quantity to limit from a denomination 
+					// for each denomination until change can be found
+					if (currentQuantity == ignoreQuantity) {
+						i++;
+						continue;
+					} else {
+						currentQuantity++;
+					}
+				}
+				thistemp.increment(i, -1); // << decrement
+				change.increment(i);
+				amount = Round(amount - values[i]);
+			}
+		}
+
+		if (amount == 0) break;
+
+		// if normal top bottom change finding, start selective ignore
+		// amounts in each denomination in next loop:
+		if (ignoredIdx == -1) {
+			ignoredIdx = 0;
+			continue;
+		}
+
+		if (ignoreQuantity >= thistemp[ignoredIdx]) {
+			ignoredIdx++;
+			ignoreQuantity = 0;
+		} else {
+			ignoreQuantity++;
+		}
+	} while (ignoredIdx != (SIZE-1));
+
+	if (amount > 0) throw runtime_error("Insufficient change!");
 
 	return change;
 }
