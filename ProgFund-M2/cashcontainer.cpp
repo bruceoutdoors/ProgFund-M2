@@ -229,8 +229,9 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 	float amount;
 	CashContainer thistemp;
 	CashContainer change;
-	int ignoredIdx = -1;
-	int ignoreQuantity = 0;
+	int ignoredIdx = -1; // >= 0 begins selective ignorance
+	int attemptedQuantity;
+	bool hasAttemptedQuantity = false;
 
 	do {
 		thistemp = *this; // copy this contents
@@ -238,22 +239,31 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 		amount = changeAmount;
 		
 		for (size_t i = 0; i < SIZE; i++) {
-			int currentQuantity = 0;
+			int counter = 0; // counter to repeat "attemptedQuantity" times 
 			while (amount >= values[i] && thistemp[i] > 0) {
-				// Test case: 
-				// - change for 2 given 2 0.5, 5 0.2, the change should be 2 0.5 + 5 0.2.
-				// - change for 0.6 given 1 0.5, 3 0.2, 0 0.1, the change should be 3 0.2.
-				// - change for 0.1 given 0 0.1, the change cannot be output.
-				if (ignoredIdx != -1 && values[i] == values[ignoredIdx]) {
+				/** Test case: 
+				 * - change for 2 given 3 0.5, 6 0.2, 0 0.1, the change should be 2 0.5 + 5 0.2.
+				 * - change for 0.6 given 1 0.5, 3 0.2, 0 0.1, the change should be 3 0.2.
+				 * - change for 0.1 given 0 0.1, the change cannot be output.
+				 **/
+				if (ignoredIdx != -1 && i == ignoredIdx) {
 					// selectively choose an quantity to limit from a denomination 
 					// for each denomination until change can be found
-					if (currentQuantity == ignoreQuantity) {
+					if (!hasAttemptedQuantity) {
+						// we can assert that we can never execute "attemptedQuantity" 
+						// more than "thistemp[i]" (available quantity) because of the
+						// condition in the enclosing while loop above ^
+						hasAttemptedQuantity = true;
+						attemptedQuantity = (int)(amount / values[i]);
+					}
+					
+					if (counter == attemptedQuantity) {
 						i++;
 						continue;
-					} else {
-						currentQuantity++;
-					}
+					} else counter++;
 				}
+
+				// in selective ignorance, the following lines are executed "attemptedQuantity" times:
 				thistemp.increment(i, -1); // << decrement
 				change.increment(i);
 				amount = Round(amount - values[i]);
@@ -269,11 +279,19 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 			continue;
 		}
 
-		if (ignoreQuantity >= thistemp[ignoredIdx]) {
+		// we assert from here on selective ignorance is already enabled:
+		if (!hasAttemptedQuantity) {
 			ignoredIdx++;
-			ignoreQuantity = 0;
+			continue;
+		}
+
+		if (attemptedQuantity < 0) {
+			// if all attempts have failed, we move on to the next denomination
+			ignoredIdx++;
+			hasAttemptedQuantity = false;
 		} else {
-			ignoreQuantity++;
+			// try again, with less
+			attemptedQuantity--;
 		}
 	} while (ignoredIdx != (SIZE-1));
 
