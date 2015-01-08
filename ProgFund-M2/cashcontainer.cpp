@@ -254,11 +254,10 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 					// found an denomination we can selectively ignore that is less
 					// than the change amount and has a quantity.
 					if (!hasAttemptedQuantity) {
-						// we can assert that we can never execute "attemptedQuantity" 
-						// more than "thistemp[i]" (available quantity) because of the
-						// condition in the enclosing while loop above ^
 						hasAttemptedQuantity = true;
 						attemptedQuantity = (int)(amount / values[i]);
+						// attempted quantity should not exceed the quantity of available change
+						if (attemptedQuantity > thistemp[i]) attemptedQuantity = thistemp[i];
 					}
 					
 					if (counter == attemptedQuantity) {
