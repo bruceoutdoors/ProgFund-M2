@@ -248,7 +248,11 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 				 **/
 				if (ignoredIdx != -1 && i == ignoredIdx) {
 					// selectively choose an quantity to limit from a denomination 
-					// for each denomination until change can be found
+					// for each denomination until change can be found.
+
+					// being able to reach this enclosing condition meant we have
+					// found an denomination we can selectively ignore that is less
+					// than the change amount and has a quantity.
 					if (!hasAttemptedQuantity) {
 						// we can assert that we can never execute "attemptedQuantity" 
 						// more than "thistemp[i]" (available quantity) because of the
@@ -258,6 +262,7 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 					}
 					
 					if (counter == attemptedQuantity) {
+						// once the counter is exhausted we skip to the next denomination
 						i++;
 						continue;
 					} else counter++;
@@ -272,14 +277,10 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 
 		if (amount == 0) break;
 
-		// if normal top bottom change finding, start selective ignore
-		// amounts in each denomination in next loop:
-		if (ignoredIdx == -1) {
-			ignoredIdx = 0;
-			continue;
-		}
-
-		// we assert from here on selective ignorance is already enabled:
+		// if there is no available attempted quantities to try, the 
+		// following condition either starts the selective ignorance when 
+		// it is -1, or repeats the loop with the next denomination since
+		// we can't find an attempted quantity from it
 		if (!hasAttemptedQuantity) {
 			ignoredIdx++;
 			continue;
@@ -287,6 +288,7 @@ CashContainer CashContainer::calcChange(float changeAmount) const
 
 		if (attemptedQuantity < 0) {
 			// if all attempts have failed, we move on to the next denomination
+			// and ask for the next attempted quantity:
 			ignoredIdx++;
 			hasAttemptedQuantity = false;
 		} else {
